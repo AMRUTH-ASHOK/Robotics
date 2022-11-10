@@ -7,8 +7,8 @@ set ns [new Simulator]
 set nf [open lab1.nam w]
 $ns namtrace-all $nf
 
-set f[open lab1.tr w]
-$ns trace-all $f
+set tf [open lab1.tr w]
+$ns trace-all $tf
 
 proc finish {} {
 global ns nf f
