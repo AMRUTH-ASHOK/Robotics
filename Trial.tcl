@@ -1,67 +1,86 @@
-# Implement 3 nodes point to point with duplex links between them
-# Set the queue size, vary the bandwidth and find the number of packets dropped
-# set up udp connections between the nodes and send packets
-
-#create a new simulator object
 set ns [new Simulator]
 set nf [open lab1.nam w]
 $ns namtrace-all $nf
 
+
+
 set tf [open lab1.tr w]
 $ns trace-all $tf
 
+
+
 proc finish {} {
-global ns nf f
+global ns nf tf
 $ns flush-trace
-close $f
 close $nf
+close $tf
 exec nam lab1.nam &
 exit 0
-
-# set up the nodes
+}
 set n0 [$ns node]
 set n1 [$ns node]
 set n2 [$ns node]
+set n3 [$ns node]
 
-#set up duplex links between the nodes
-$ns duplex-link $n0 $n1 1Mb 10ms DropTail
-$ns duplex-link $n1 $n2 1Mb 10ms DropTail
 
-#set queue limit
-$ns queue-limit $n0 $n1 100
-$ns queue-limit $n1 $n2 100
 
-#set up udp connections between the nodes
+$ns duplex-link $n0 $n2 200Mb 10ms DropTail
+$ns duplex-link $n1 $n2 100Mb 5ms DropTail
+$ns duplex-link $n2 $n3 1Mb 1000ms DropTail
+
+
+
+$ns queue-limit $n0 $n2 10
+$ns queue-limit $n1 $n2 10
+
+
+
 set udp0 [new Agent/UDP]
 $ns attach-agent $n0 $udp0
-# set up application layer
+
+
+
 set cbr0 [new Application/Traffic/CBR]
-$cbr0 set packetSize_ 1000
-$cbr0 set interval_ 0.1
-$cbr0 attach-agent $$udp0
+$cbr0 set packetSize_ 500
+$cbr0 set interval_ 0.005
+$cbr0 attach-agent $udp0
 
 
-#set up udp connections between the nodes
+
 set udp1 [new Agent/UDP]
 $ns attach-agent $n1 $udp1
-# set up application layer
+
+
+
 set cbr1 [new Application/Traffic/CBR]
-$cbr0 set packetSize_ 1000
-$cbr0 set interval_ 0.1
-$cbr0 attach-agent $$udp1
+$cbr1 attach-agent $udp1
 
 
-set null0 [new Agent/Null]
-$ns attach-agent $n2 $null
 
-$ns connect $udp0 $null0
-$ns connect $udp1 $null0
+set udp2 [new Agent/UDP]
+$ns attach-agent $n2 $udp2
 
 
-$ns at 0.0 "$cbr0 start"
-$ns at 0.0 "$cbr1 start"
-$ns at 10.0 "finish"
+
+set cbr2 [new Application/Traffic/CBR]
+$cbr2 attach-agent $udp2
+
+
+
+set null() [new Agent/Null]
+$ns attach-agent $n3 $null()
+
+
+
+$ns connect $udp0 $null()
+$ns connect $udp1 $null()
+
+
+
+$ns at 0.1 "$cbr0 start"
+$ns at 0.2 "$cbr1 start"
+$ns at 1.0 "finish"
+
+
 
 $ns run
-
-}
