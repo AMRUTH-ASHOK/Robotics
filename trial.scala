@@ -1,43 +1,23 @@
-import org.apache.spark.sql._
-import org.apache.spark.sql.functions._
-import org.graphframes._
+import org.apache.spark._
+import org.apache.spark.graphx._
+import org.apache.spark.rdd.RDD
 
-val v = spark.createDataFrame(List(
-  ("a", "Alice", 34),
-  ("b", "Bob", 36),
-  ("c", "Charlie", 30),
-  ("d", "David", 29),
-  ("e", "Esther", 32),
-  ("f", "Fanny", 36),
-  ("g", "Gabby", 60),
-  ("h", "Hari", 23),
-  ("i", "Indra", 33),
-  ("j", "Jyothi", 32),
-  ("k", "Karun", 22),
-  ("l", "Leone", 21)
-)).toDF("id", "name", "age")
-// Edge DataFrame
-val e = spark.createDataFrame(List(
-  ("a", "b", "friend"),
-  ("b", "a", "friend"),
-  ("a", "k", "friend"),
-  ("k", "a", "friend"),
-  ("c", "b", "father"),
-  ("c", "d", "son"),
-  ("c", "e", "husband"),
-  ("c", "f", "brother"),
-  ("f", "c", "brother"),
-  ("f", "g", "following"),
-  ("a", "g", "following"),
-  ("h", "g", "following"),
-  ("l", "g", "following"),
-  ("k", "l", "following"),
-  ("k", "j", "friend"),
-  ("j", "k", "friend"),
-  ("i", "k", "friend")
-)).toDF("src", "dst", "relationship")
+val v = spark.createDataFrame(List()).toDF()
+val e = spark.createDataFrame(List()).toDF()
 val g = GraphFrame(v, e)
-g.inDegrees.show()
-val paths: DataFrame = g.bfs.fromExpr("id = 'f'").toExpr("id ='l'").run()
-paths.show
-g.degrees.select(g.degrees("id")).except(g.outDegrees.select(g.outDegrees("id"))).show
+
+val paths = g.bfs.fromExpr("id='a'").toExpr("id = 'd'").run()
+val paths1 = g.shortestPaths.landmarks(Seq("a", "d")).run()
+val results = g.triangleCount.run()
+val results3 = g.pageRank.resetProbability(0.15).maxIter(10).sourceId("a").run()
+val result = vertices.select(vertices("id")).except(outdegrees.select(outdegrees("id")))
+
+
+val filteredPaths = g.bfs.fromExpr("name = 'Esther'").toExpr("age < 32")
+  .edgeFilter("relationship != 'friend'")
+  .maxPathLength(3)
+  .run()
+val youngest = g.vertices.groupBy().min("age")
+val numFollows = g.edges.filter("relationship = 'follow'").count()
+val result = g.stronglyConnectedComponents.maxIter(10).run()
+val result = g.connectedComponents.run()
