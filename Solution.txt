@@ -1,17 +1,21 @@
-sudo apt install curl
-
-sudo curl -fsSL https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -
-
-apt-key list
-
-echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
-
-sudo apt update
-
-sudo apt install mongodb-org
-
 sudo systemctl start mongod.service
-
 sudo systemctl status mongod
-
 mongo
+
+---- Update ----
+
+---- Arrays ----
+db.Food.insert({_id:1,fruits:['banana','apple','cherry']})
+db.Food.find({fruits:["orange","grapes"]})
+db.Food.find({fruits:{$all:["orange","grapes"]}})
+db.Food.find({_id:1},{fruits:{$slice:[0,2]}})
+
+db.Food.update({_id:3},{$set:{'fruits.1':'apple','fruits.2':'jackfruit'}})
+db.food.update({_id:1,fruits:"apple"},{$set:{"fruits.$":"An apple"}})
+db.Food.update({_id:2},{$push:{"fruits":"banana"}}
+db.Food.update({_id:8},{$pull:{fruits:{$in:["grapes","orange"]}}})
+
+
+---- Aggregate ----
+db.Customers.aggregate({$group:{_id:"$CustID",TotAccBal:{$min:"$AccBal"}}})
+db.Customers.aggregate({$match:{Acctype:"S"}},{$group:{_id:"$CustID",TotAccBal:{$sum:"$Accbal"}}},{$match:{TotAccBal:{$gt:1200}}})
