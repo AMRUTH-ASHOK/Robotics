@@ -18,30 +18,7 @@ kafka-topics --list --bootstrap-server localhost:9092
 kafka-console-consumer --bootstrap-server localhost:9092 --topic weather --from-beginning
 	
 ## STARTING SPARK SHELL WITH PACKAGES
-spark-shell --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.3.1
-
-=======================================================================================
-
-(Wrapping Scala file in set and executing it)
-
-->Project
-    -> StreamHandler
-       ->src
-         ->main
-	  ->scala
-	   ->StreamHandler.scala
-		    
-    -> iot_devices.ipynb
-
-
-
-## Define .scala file
-## Define .sbt file accordingly
-
-# open a new terminal (get to the desired path which contains the above mentioned scala and sbt files:
- here it is StreamHandler folder)
-
-sbt package (will take some time)
-a .jar file will be created in target/scala-2.12/ (this jar file is to be executed)
-
-spark-submit --class StreamHandler --master "local[*]" --packages "org.apache.spark:spark-sql-kafka-0-10_2.12:3.3.1" target/scala-2.12/streamhandler_2.12-0.1.0-SNAPSHOT.jar
+spark-shell --conf "spark.mongodb.input.uri=mongodb://127.0.0.1/test.myCollection?readPreference=primaryPreferred" --conf "spark.mongodb.output.uri=mongodb://127.0.0.1/Trial.stock" --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.3.1,org.mongodb.spark:mongo-spark-connector:10.0.0
+				
+				
+=====================================. END .================================================
